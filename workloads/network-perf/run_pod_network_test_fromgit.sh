@@ -3,7 +3,7 @@ export WORKLOAD=pod
 
 source ./common.sh
 
-for pairs in 1 2 4
+for pairs in 1
 do
 export pairs=${pairs}
 deploy_workload

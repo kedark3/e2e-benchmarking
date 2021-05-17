@@ -229,12 +229,16 @@ assign_uuid() {
 }
 
 run_benchmark_comparison() {
+  set -x
   ../../utils/touchstone-compare/run_compare.sh uperf ${baseline_uperf_uuid} ${compare_uperf_uuid} ${pairs}
   pairs_array=( "${pairs_array[@]}" "compare_output_${pairs}.yaml" )
+  set +x
 }
 
 generate_csv() {
+  set -x
   python3 csv_gen.py --files $(echo "${pairs_array[@]}") --latency_tolerance=$latency_tolerance --throughput_tolerance=$throughput_tolerance  
+  set +x
 }
 
 init_cleanup() {
