@@ -155,7 +155,16 @@ deploy_workload() {
 check_logs_for_errors() {
 client_pod=$(oc get pods -n my-ripsaw --no-headers | awk '{print $1}' | grep uperf-client | awk 'NR==1{print $1}')
 if [ ! -z "$client_pod" ]; then
+  set +x
+  oc project my-ripsaw
   num_conn_refused=$(oc logs ${client_pod} -n my-ripsaw | grep "Connection refused"  | wc -l)
+  for node in `oc get po -n my-ripsaw -o wide | grep 'uperf' | awk '{print $7}'`; do
+    for svc_ip in `oc get -n my-ripsaw svc | grep ClusterIP | awk '{print $3}'`; do
+      log "Checking flows on $node for $svc_ip"
+      oc debug node/$node -- chroot /host ovs-ofctl dump-flows br-int | grep  $svc_ip | grep 20000 -c
+    done
+  done
+  set -x
   log "Connection refused seen so far $num_conn_refused times"
   num_critical=$(oc logs ${client_pod} -n my-ripsaw | grep CRITICAL | wc -l)
   if [ $num_conn_refused -gt 50 -a $num_critical -gt 3 ] ; then
