@@ -158,7 +158,7 @@ if [ ! -z "$client_pod" ]; then
   num_conn_refused=$(oc logs ${client_pod} -n my-ripsaw | grep "Connection refused"  | wc -l)
   log "Connection refused seen so far $num_conn_refused times"
   num_critical=$(oc logs ${client_pod} -n my-ripsaw | grep CRITICAL | wc -l)
-  if [ $num_conn_refused -gt 10 -a $num_critical -gt 3 ] ; then
+  if [ $num_conn_refused -gt 50 -a $num_critical -gt 3 ] ; then
     log "Encountered CRITICAL condition more than 3 times in uperf-client logs"
     log "Log dump of uperf-client pod"
     oc logs $client_pod -n my-ripsaw
@@ -167,7 +167,7 @@ if [ ! -z "$client_pod" ]; then
     oc logs $server_pod -n my-ripsaw
     log "Following services were also present before calling delete_benchmark due to failure"
     oc describe svc -n my-ripsaw
-    sleep 600
+    sleep 1200
     delete_benchmark
     exit 1
   fi
